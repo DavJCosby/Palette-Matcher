@@ -19,11 +19,70 @@ uniform float lightConeAngle;
 
 const vec3 VIEW_DIR = vec3(0.0, 0.0, 1.0);
 const vec3 LIGHT_COLOR = vec3(255.0, 245.0, 245.0) * 18.0; // 6200k
-
+// gooch shading constants
 const vec3 K_COOL = vec3(0, 0, 1);
 const vec3 K_WARM = vec3(1, 1, 0);
 
-// Utility functions
+struct LightData {
+    vec3 color; // color of light
+    vec3 direction; // direction to light from fragment (in viewspace)
+};
+
+// FORWARD DECLARATIONS - LIGHTING FUNCTIONS
+LightData sample_spotlight();
+vec3 blinn_BRDF(vec3 incoming, vec3 outgoing, vec3 specular, vec3 n);
+vec3 blinn_shade(LightData light, vec3 diffuse, vec3 specular, vec3 n);
+
+// FORWARD DECLARATIONS - UTILITY FUNCTIONS
+float dot_clamped(vec3 a, vec3 b);
+float distance_squared(vec3 p1, vec3 p2);
+float degrees_between(vec3 u, vec3 v);
+
+void main() {
+    vec3 k_d = texture(diffuse_tex, texCoord).rgb * base_color;
+    vec3 k_s = texture(specular_tex, texCoord).rgb * specular_color;
+    LightData spotlight = sample_spotlight();
+
+    vec3 shaded_color = blinn_shade(spotlight, k_d, k_s, normalize(normal));
+    color = vec4(shaded_color, 1);
+}
+
+// LIGHTING FUNCTIONS
+
+LightData sample_spotlight() {
+    vec3 direction_to_light = normalize(lightPosition - fragPosition);
+    vec3 fragpos_lightspace = lightView_Position.xyz / lightView_Position.w;
+    vec3 spotlight_look_dir = normalize(lightPosition); // Crude; assumes light is always pointed at origin. Fix later.
+    float angle = degrees_between(spotlight_look_dir, direction_to_light);
+
+    float crop = angle < (lightConeAngle * 0.5) ? 1.0 : 0.0;
+    float attenuation = 1.0 / distance_squared(lightPosition, fragPosition);
+    float shadowed = texture(shadow, fragpos_lightspace.xy).r < fragpos_lightspace.z ? 0 : 1;
+
+    vec3 color = LIGHT_COLOR * crop * attenuation * shadowed;
+    vec3 direction_viewspace = normalize(normalMatrix * direction_to_light);
+
+    return LightData(color, direction_viewspace);
+}
+
+vec3 blinn_shade(LightData light, vec3 diffuse, vec3 specular, vec3 n) {
+    vec3 ambient_contrib = ambient * diffuse;
+
+    vec3 reflection = blinn_BRDF(light.direction, VIEW_DIR, specular, n);
+    vec3 light_contrib = (diffuse + reflection)
+            * light.color
+            * dot_clamped(n, light.direction);
+
+    return ambient_contrib + light_contrib;
+}
+
+vec3 blinn_BRDF(vec3 incoming, vec3 outgoing, vec3 specular, vec3 n) {
+    vec3 halfway = normalize(incoming + outgoing);
+    float specular_scale = pow(dot_clamped(n, halfway), shine);
+    return specular * specular_scale;
+}
+
+// UTILITY FUNCTIONS
 
 float dot_clamped(vec3 a, vec3 b) {
     return max(0.0, dot(a, b));
@@ -34,43 +93,13 @@ float distance_squared(vec3 p1, vec3 p2) {
     return dot(diff, diff);
 }
 
+// TODO: just use radians bro
 float degrees_between(vec3 u, vec3 v) {
     float cosTheta = dot(u, v);
     cosTheta = clamp(cosTheta, -1.0, 1.0);
     float theta = acos(cosTheta);
     float angleDegrees = degrees(theta);
     return angleDegrees;
-}
-
-// Shading functions
-
-vec3 blinn_BRDF(
-    vec3 incoming,
-    vec3 outgoing,
-    vec3 specular,
-    vec3 n
-) {
-    vec3 h = normalize(incoming + outgoing);
-
-    float phi = acos(dot(normalize(n), h));
-    float specular_scale = pow(max(0.0, cos(phi)), shine);
-
-    return specular * specular_scale;
-}
-
-vec3 blinn_shade(
-    vec3 light_color,
-    vec3 light_dir,
-    vec3 cam_dir,
-    vec3 diffuse,
-    vec3 specular,
-    vec3 n
-) {
-    vec3 ambient_contrib = ambient * diffuse;
-    vec3 reflection = blinn_BRDF(light_dir, cam_dir, specular, n);
-    vec3 light_contrib = (diffuse + reflection) * light_color * dot_clamped(n, light_dir);
-
-    return ambient_contrib + light_contrib;
 }
 
 // // https://64.github.io/tonemapping/
@@ -83,39 +112,3 @@ vec3 blinn_shade(
 //     float e = 0.14f;
 //     return clamp((v * (a * v + b)) / (v * (c * v + d) + e), 0.0f, 1.0f);
 // }
-
-void main() {
-    vec3 light_direction = normalize(lightPosition - fragPosition);
-
-    float attenuation = 1.0 / distance_squared(lightPosition, fragPosition);
-    // crude; assumes light is always pointed at (0, 0, 0)
-    float visibility = degrees_between(normalize(lightPosition), light_direction)
-            < (lightConeAngle * 0.5) ? 1.0 : 0.0;
-
-    light_direction = normalize(
-            normalMatrix * light_direction
-        );
-
-    vec3 diffuse = texture(diffuse_tex, texCoord).rgb * base_color;
-    vec3 specular = texture(specular_tex, texCoord).rgb * specular_color;
-    vec3 n = normalize(normal);
-
-    vec3 p = lightView_Position.xyz / lightView_Position.w;
-    // textureProj() doesn't seem to be working
-    vec3 light_color = LIGHT_COLOR
-            * attenuation * visibility
-            * (texture(shadow, p.xy).r < p.z ? 0 : 1);
-
-    vec3 shaded_color = blinn_shade(
-            light_color,
-            light_direction,
-            normalize(VIEW_DIR),
-            diffuse,
-            specular,
-            n
-        );
-
-    color = vec4(shaded_color, 1);
-
-    //
-}

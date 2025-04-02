@@ -46,7 +46,7 @@ GLFWwindow* initAndCreateWindow() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     return window;
 }
 

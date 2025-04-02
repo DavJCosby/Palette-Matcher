@@ -9,7 +9,8 @@
 using std::string;
 using std::vector;
 
-void build_programs(ShaderPrograms& programs) {
+ShaderPrograms build_programs() {
+    ShaderPrograms programs;
     cyGLSLProgram& mesh_prog = programs.mesh;
     cyGLSLProgram& shadow_prog = programs.shadow;
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
@@ -33,6 +34,8 @@ void build_programs(ShaderPrograms& programs) {
     shadow_prog.BuildFiles("./shaders/shadow.vert", "./shaders/shadow.frag");
     shadow_prog.Bind();
     shadow_prog.RegisterUniform(0, "MVP");
+
+    return programs;
 }
 
 struct MeshData load_mesh(cyGLSLProgram& prog, char* path) {
@@ -55,37 +58,6 @@ struct MeshData load_mesh(cyGLSLProgram& prog, char* path) {
     }
 
     return md;
-}
-
-void bind_material_properties(cyGLSLProgram& prog, cyTriMesh& mesh) {
-    if (mesh.NM() > 0) {
-        //std::cout << "at least one material was detected." << std::endl;
-        cyTriMesh::Mtl objMaterial = mesh.M(0);
-
-        prog.SetUniform3("BaseColor", objMaterial.Kd);
-        prog.SetUniform3("SpecularColor", objMaterial.Ks);
-        prog.SetUniform("Shine", objMaterial.Ns);
-        prog.SetUniform3("Ambient", objMaterial.Ka);
-    } else {
-        //std::cout << "Using default material settings." << std::endl;
-        // loadTexture(prog, "./assets/blank.png", (char*)"diffuse_tex", 0);
-        // loadTexture(prog, "./assets/blank.png", (char*)"specular_tex", 1);
-        float kd_default[3] = {0.25, 0.25, 0.25};
-        float ks_default[3] = {0.65, 0.65, 0.65};
-        float ns_default = 50.0;
-        float ka_default[3] = {0.21, 0.21, 0.21};
-
-        prog.SetUniform3("BaseColor", kd_default);
-        prog.SetUniform3("SpecularColor", ks_default);
-        prog.SetUniform("Shine", ns_default);
-        prog.SetUniform3("Ambient", ka_default);
-    }
-}
-
-void cleanup_mesh_data(MeshData& meshData) {
-    glDeleteBuffers(1, &meshData.VBO);
-    glDeleteBuffers(1, &meshData.EBO);
-    glDeleteVertexArrays(1, &meshData.VAO);
 }
 
 void read_texture_and_handle_error(
@@ -227,10 +199,4 @@ bind_mesh_vertex_attributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
     glBindVertexArray(0);
 
     return {VAO, VBO, EBO, mesh.NF(), mesh};
-}
-
-void draw_mesh(cyGLSLProgram& prog, struct MeshData& meshData) {
-    glBindVertexArray(meshData.VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.EBO);
-    glDrawElements(GL_TRIANGLES, meshData.numFaces * 3, GL_UNSIGNED_INT, 0);
 }

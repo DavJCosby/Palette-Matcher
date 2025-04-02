@@ -15,10 +15,10 @@ class SpotLight {
 
   private:
     cyGLSLProgram& shadow_program;
+    cyGLSLProgram& mesh_program;
     cyMatrix4f projection;
-    cy::GLRenderDepth2D shadowMap;
-    GLuint depthMap;
-    GLuint depthMapFBO; // Framebuffer object
+    cy::GLRenderDepth2D shadow_map;
+    GLuint depth_map;
 
   public:
     SpotLight(
@@ -26,6 +26,7 @@ class SpotLight {
         cyVec3f lookat,
         float fov,
         cyGLSLProgram& shadow_program,
+        cyGLSLProgram& mesh_program,
         uint width,
         uint height
     );
@@ -34,11 +35,11 @@ class SpotLight {
 
     void Unbind();
 
-    void setupForMeshProgram(cyGLSLProgram& meshProgram);
-
     void updateMVP();
 
     GLuint getTextureID();
 
     cyMatrix4f getLightSpaceMatrix() const;
+
+    void updateUniforms();
 };

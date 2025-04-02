@@ -15,6 +15,7 @@ SpotLight::SpotLight(
     cyVec3f lookat,
     float fov,
     cyGLSLProgram& shadow_program,
+    cyGLSLProgram& mesh_program,
     unsigned int width,
     unsigned int height
 ) :
@@ -23,7 +24,8 @@ SpotLight::SpotLight(
     fov(fov),
     width(width),
     height(height),
-    shadow_program(shadow_program) {
+    shadow_program(shadow_program),
+    mesh_program(mesh_program) {
     // Build shader
     this->shadow_program.BuildFiles(
         "./shaders/shadow.vert",
@@ -33,14 +35,14 @@ SpotLight::SpotLight(
     this->shadow_program.RegisterUniform(0, "MVP");
     updateMVP();
 
-    glBindTexture(GL_TEXTURE_2D, this->depthMap);
-    glGenTextures(1, &this->depthMap);
+    glBindTexture(GL_TEXTURE_2D, this->depth_map);
+    glGenTextures(1, &this->depth_map);
 
-    this->shadowMap
+    this->shadow_map
         .Initialize(true, this->width, this->height, GL_DEPTH_COMPONENT24);
 
-    this->shadowMap.SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
-    this->shadowMap.Bind();
+    this->shadow_map.SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
+    this->shadow_map.Bind();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind framebuffer
 }
@@ -62,7 +64,7 @@ void SpotLight::updateMVP() {
 void SpotLight::Bind() {
     // Save previous state
     this->shadow_program.Bind();
-    this->shadowMap.Bind();
+    this->shadow_map.Bind();
     glViewport(0, 0, this->width, this->height);
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -70,11 +72,11 @@ void SpotLight::Bind() {
 }
 
 void SpotLight::Unbind() {
-    this->shadowMap.Unbind();
+    this->shadow_map.Unbind();
 }
 
 GLuint SpotLight::getTextureID() {
-    return this->shadowMap.GetTextureID();
+    return this->shadow_map.GetTextureID();
 }
 
 cyMatrix4f SpotLight::getLightSpaceMatrix() const {
@@ -85,13 +87,13 @@ cyMatrix4f SpotLight::getLightSpaceMatrix() const {
     return result;
 }
 
-void SpotLight::setupForMeshProgram(cyGLSLProgram& meshProgram) {
-    meshProgram.Bind();
+void SpotLight::updateUniforms() {
+    this->mesh_program.Bind();
     float lightSpaceMatrix[16];
     cyMatrix4f lightspace = this->getLightSpaceMatrix();
     lightspace.Get(lightSpaceMatrix);
 
-    meshProgram.SetUniformMatrix4("LightSpaceMatrix", lightSpaceMatrix);
-    meshProgram.SetUniform3("LightPosition", this->origin.Elements());
-    meshProgram.SetUniform("LightConeAngle", this->fov);
+    this->mesh_program.SetUniformMatrix4("LightSpaceMatrix", lightSpaceMatrix);
+    this->mesh_program.SetUniform3("LightPosition", this->origin.Elements());
+    this->mesh_program.SetUniform("LightConeAngle", this->fov);
 }

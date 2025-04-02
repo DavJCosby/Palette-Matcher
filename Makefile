@@ -1,7 +1,7 @@
 
 BUILD_DIR = ./build
 
-OBJS = $(BUILD_DIR)/glad.o $(BUILD_DIR)/rendering.o $(BUILD_DIR)/ui.o $(BUILD_DIR)/spotlight.o $(BUILD_DIR)/lodepng.o
+OBJS = $(BUILD_DIR)/glad.o $(BUILD_DIR)/rendering.o $(BUILD_DIR)/ui.o $(BUILD_DIR)/spotlight.o $(BUILD_DIR)/scene.o $(BUILD_DIR)/mesh.o $(BUILD_DIR)/lodepng.o
 EXECUTABLE_NAME = App.exe
 
 CC = g++
@@ -24,6 +24,12 @@ $(BUILD_DIR)/glad.o: ./src/glad.c
 
 $(BUILD_DIR)/ui.o: ./src/ui.cpp
 	$(CC) ./src/ui.cpp $(FULL_CC) -c -o $(BUILD_DIR)/ui.o
+
+$(BUILD_DIR)/scene.o: ./src/scene.cpp
+	$(CC) ./src/scene.cpp $(FULL_CC) -c -o $(BUILD_DIR)/scene.o
+
+$(BUILD_DIR)/mesh.o: ./src/mesh.cpp
+	$(CC) ./src/mesh.cpp $(FULL_CC) -c -o $(BUILD_DIR)/mesh.o
 
 $(BUILD_DIR)/spotlight.o: ./src/spotlight.cpp
 	$(CC) ./src/spotlight.cpp $(FULL_CC) -c -o $(BUILD_DIR)/spotlight.o

@@ -27,21 +27,22 @@ struct ShaderPrograms {
     cyGLSLProgram shadow;
 };
 
-void buildPrograms(ShaderPrograms& programs);
+void build_programs(ShaderPrograms& programs);
 
-struct MeshData loadMesh(cyGLSLProgram& prog, char* path);
+struct MeshData load_mesh(cyGLSLProgram& prog, char* path);
 
-void cleanupMeshData(MeshData& meshData);
+void cleanup_mesh_data(MeshData& meshData);
 
-void loadTexture(
+void load_texture(
     cyGLSLProgram& prog,
     std::basic_string<char> filepath,
     char* attrib_name,
     unsigned tex_id
 );
 
-struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh);
+struct MeshData
+bind_mesh_vertex_attributes(cyGLSLProgram& prog, cyTriMesh& mesh);
 
-void bindMaterialProperties(cyGLSLProgram& prog, cyTriMesh& mesh);
+void bind_material_properties(cyGLSLProgram& prog, cyTriMesh& mesh);
 
-void drawMesh(cyGLSLProgram& prog, struct MeshData& meshData);
+void draw_mesh(cyGLSLProgram& prog, struct MeshData& meshData);

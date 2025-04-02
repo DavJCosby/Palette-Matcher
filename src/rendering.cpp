@@ -9,7 +9,7 @@
 using std::string;
 using std::vector;
 
-void buildPrograms(ShaderPrograms& programs) {
+void build_programs(ShaderPrograms& programs) {
     cyGLSLProgram& mesh_prog = programs.mesh;
     cyGLSLProgram& shadow_prog = programs.shadow;
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
@@ -26,6 +26,8 @@ void buildPrograms(ShaderPrograms& programs) {
     mesh_prog.RegisterUniform(8, "LightPosition");
     mesh_prog.RegisterUniform(9, "LightConeAngle");
 
+    programs.mesh.SetUniform("ShadowMap", 4); // shadow map is texture unit 4
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     shadow_prog.BuildFiles("./shaders/shadow.vert", "./shaders/shadow.frag");
@@ -33,7 +35,7 @@ void buildPrograms(ShaderPrograms& programs) {
     shadow_prog.RegisterUniform(0, "MVP");
 }
 
-struct MeshData loadMesh(cyGLSLProgram& prog, char* path) {
+struct MeshData load_mesh(cyGLSLProgram& prog, char* path) {
     prog.Bind();
     cyTriMesh mesh;
     bool success = mesh.LoadFromFileObj(path);
@@ -42,20 +44,20 @@ struct MeshData loadMesh(cyGLSLProgram& prog, char* path) {
         exit(-1);
     }
 
-    struct MeshData md = bindMeshVertexAttributes(prog, mesh);
+    struct MeshData md = bind_mesh_vertex_attributes(prog, mesh);
     if (mesh.NM() > 0) { // hecka jank
         string diffuse_path = mesh.M(0).map_Kd.data;
         string specular_path = mesh.M(0).map_Ks.data;
         diffuse_path = "./assets/teapot/" + diffuse_path;
         specular_path = "./assets/teapot/" + specular_path;
-        loadTexture(prog, diffuse_path, (char*)"DiffuseTexture", 0);
-        loadTexture(prog, specular_path, (char*)"SpecularTexture", 1);
+        load_texture(prog, diffuse_path, (char*)"DiffuseTexture", 0);
+        load_texture(prog, specular_path, (char*)"SpecularTexture", 1);
     }
 
     return md;
 }
 
-void bindMaterialProperties(cyGLSLProgram& prog, cyTriMesh& mesh) {
+void bind_material_properties(cyGLSLProgram& prog, cyTriMesh& mesh) {
     if (mesh.NM() > 0) {
         //std::cout << "at least one material was detected." << std::endl;
         cyTriMesh::Mtl objMaterial = mesh.M(0);
@@ -80,13 +82,13 @@ void bindMaterialProperties(cyGLSLProgram& prog, cyTriMesh& mesh) {
     }
 }
 
-void cleanupMeshData(MeshData& meshData) {
+void cleanup_mesh_data(MeshData& meshData) {
     glDeleteBuffers(1, &meshData.VBO);
     glDeleteBuffers(1, &meshData.EBO);
     glDeleteVertexArrays(1, &meshData.VAO);
 }
 
-void readTextureAndHandleError(
+void read_texture_and_handle_error(
     vector<unsigned char>& img_data_out,
     unsigned& width_out,
     unsigned& height_out,
@@ -101,7 +103,7 @@ void readTextureAndHandleError(
     }
 }
 
-void loadTexture(
+void load_texture(
     cyGLSLProgram& prog,
     string filepath,
     char* attrib_name,
@@ -111,7 +113,7 @@ void loadTexture(
     unsigned width, height;
     vector<unsigned char> diffuse_data;
 
-    readTextureAndHandleError(
+    read_texture_and_handle_error(
         diffuse_data,
         width,
         height,
@@ -132,7 +134,8 @@ void loadTexture(
     prog[attrib_name] = tex_id;
 }
 
-struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
+struct MeshData
+bind_mesh_vertex_attributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
     prog.Bind();
     mesh.ComputeNormals();
 
@@ -226,7 +229,7 @@ struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
     return {VAO, VBO, EBO, mesh.NF(), mesh};
 }
 
-void drawMesh(cyGLSLProgram& prog, struct MeshData& meshData) {
+void draw_mesh(cyGLSLProgram& prog, struct MeshData& meshData) {
     glBindVertexArray(meshData.VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.EBO);
     glDrawElements(GL_TRIANGLES, meshData.numFaces * 3, GL_UNSIGNED_INT, 0);

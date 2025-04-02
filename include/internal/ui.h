@@ -12,10 +12,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 GLFWwindow* initAndCreateWindow();
 
-void processInput(GLFWwindow* window);
+void update_viewport_size(GLFWwindow*);
 
-void updateCamera(GLFWwindow* window, ShaderPrograms& programs);
+void process_input(GLFWwindow* window);
 
-cyMatrix4f modelView(cyVec3f translation, float pitch, float yaw, float roll);
+void update_camera(GLFWwindow* window, ShaderPrograms& programs);
+
+cyMatrix4f model_view(cyVec3f translation, float pitch, float yaw, float roll);
 
 void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);

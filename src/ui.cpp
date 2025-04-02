@@ -50,7 +50,13 @@ GLFWwindow* initAndCreateWindow() {
     return window;
 }
 
-void processInput(GLFWwindow* window) {
+void update_viewport_size(GLFWwindow* window) {
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
+}
+
+void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
@@ -96,7 +102,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void updateCamera(GLFWwindow* window, ShaderPrograms& programs) {
+void update_camera(GLFWwindow* window, ShaderPrograms& programs) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     cyMatrix4f projection = cy::Matrix4f::Perspective(
@@ -106,7 +112,8 @@ void updateCamera(GLFWwindow* window, ShaderPrograms& programs) {
         1000.0f
     );
 
-    cyMatrix4f mv = modelView(cyVec3f(0, -5, -camDist), camRotY, 3.14, camRotX);
+    cyMatrix4f mv =
+        model_view(cyVec3f(0, -5, -camDist), camRotY, 3.14, camRotX);
     cyMatrix4f scale = cyMatrix4f::Scale(5);
     cyMatrix4f finalTransform = projection * scale * mv;
 
@@ -118,12 +125,9 @@ void updateCamera(GLFWwindow* window, ShaderPrograms& programs) {
     float mv_array[16] = {0};
     mv.Get(mv_array);
     programs.mesh.SetUniformMatrix4("MV", mv_array);
-
-    // programs.shadow.Bind();
-    // programs.shadow.SetUniformMatrix4(0, mvp_array);
 }
 
-cyMatrix4f modelView(cyVec3f translation, float yaw, float pitch, float roll) {
+cyMatrix4f model_view(cyVec3f translation, float yaw, float pitch, float roll) {
     cyMatrix4f trans = cyMatrix4f::Translation(translation);
     cyMatrix4f rot = cyMatrix4f::RotationZYX(yaw, pitch, roll);
 

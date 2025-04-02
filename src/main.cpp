@@ -16,6 +16,13 @@
 
 #include <iostream>
 
+void animate_light(SpotLight& light, cyGLSLProgram& mesh_program) {
+    double time = glfwGetTime();
+    light.origin = cyVec3f(sin(time) * 40, cos(time) * 40, 40);
+    light.updateMVP();
+    light.setupForMeshProgram(mesh_program);
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cerr
@@ -28,12 +35,12 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
 
     ShaderPrograms programs;
-    buildPrograms(programs);
+    build_programs(programs);
     programs.mesh.Bind();
 
-    struct MeshData objMeshData = loadMesh(programs.mesh, argv[1]);
+    struct MeshData objMeshData = load_mesh(programs.mesh, argv[1]);
     struct MeshData planeMeshData =
-        loadMesh(programs.mesh, (char*)"./assets/plane.obj");
+        load_mesh(programs.mesh, (char*)"./assets/plane.obj");
 
     SpotLight light(
         cyVec3f(0.0, -50.0, 40.0),
@@ -45,45 +52,38 @@ int main(int argc, char** argv) {
     );
     light.setupForMeshProgram(programs.mesh);
 
-    updateCamera(window, programs);
+    update_camera(window, programs);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window)) {
-        double time = glfwGetTime();
-        light.origin = cyVec3f(sin(time) * 40, cos(time) * 40, 40);
-        light.updateMVP();
-        light.setupForMeshProgram(programs.mesh);
+        update_viewport_size(window);
+        animate_light(light, programs.mesh);
+        process_input(window);
+        update_camera(window, programs);
 
-        processInput(window);
-        updateCamera(window, programs);
-
+        // draw shadow map
         programs.shadow.Bind();
         light.Bind();
-        //drawMesh(programs.shadow, planeMeshData);
-        drawMesh(programs.shadow, objMeshData);
+        draw_mesh(programs.shadow, objMeshData);
         light.Unbind();
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         programs.mesh.Bind();
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, light.getTextureID());
-        programs.mesh.SetUniform(6, 4);
 
-        bindMaterialProperties(programs.mesh, objMeshData.mesh);
-        drawMesh(programs.mesh, objMeshData);
-        bindMaterialProperties(programs.mesh, planeMeshData.mesh);
-        drawMesh(programs.mesh, planeMeshData);
+        bind_material_properties(programs.mesh, objMeshData.mesh);
+        draw_mesh(programs.mesh, objMeshData);
+        bind_material_properties(programs.mesh, planeMeshData.mesh);
+        draw_mesh(programs.mesh, planeMeshData);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    cleanupMeshData(objMeshData);
-    cleanupMeshData(planeMeshData);
+    cleanup_mesh_data(objMeshData);
+    cleanup_mesh_data(planeMeshData);
 
     glfwTerminate();
     return 0;

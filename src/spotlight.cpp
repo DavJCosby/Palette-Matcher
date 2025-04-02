@@ -30,7 +30,7 @@ SpotLight::SpotLight(
         "./shaders/shadow.frag"
     );
     this->shadow_program.Bind();
-    this->shadow_program.RegisterUniform(0, "mvp");
+    this->shadow_program.RegisterUniform(0, "MVP");
     updateMVP();
 
     glBindTexture(GL_TEXTURE_2D, this->depthMap);
@@ -41,7 +41,6 @@ SpotLight::SpotLight(
 
     this->shadowMap.SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
     this->shadowMap.Bind();
-    std::cout << this->shadowMap.GetTextureID() << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind framebuffer
 }
@@ -57,7 +56,7 @@ void SpotLight::updateMVP() {
     float mvp_array[16] = {0};
     this->projection.Get(mvp_array);
     this->shadow_program.Bind();
-    this->shadow_program.SetUniformMatrix4(0, mvp_array);
+    this->shadow_program.SetUniformMatrix4("MVP", mvp_array);
 }
 
 void SpotLight::Bind() {
@@ -91,7 +90,8 @@ void SpotLight::setupForMeshProgram(cyGLSLProgram& meshProgram) {
     float lightSpaceMatrix[16];
     cyMatrix4f lightspace = this->getLightSpaceMatrix();
     lightspace.Get(lightSpaceMatrix);
-    meshProgram.SetUniformMatrix4(7, lightSpaceMatrix);
-    meshProgram.SetUniform3(8, this->origin.Elements());
-    meshProgram.SetUniform(9, this->fov);
+
+    meshProgram.SetUniformMatrix4("LightSpaceMatrix", lightSpaceMatrix);
+    meshProgram.SetUniform3("LightPosition", this->origin.Elements());
+    meshProgram.SetUniform("LightConeAngle", this->fov);
 }

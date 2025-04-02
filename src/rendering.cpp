@@ -4,8 +4,9 @@
 #include "glad/glad.h"
 #include "lodepng.h"
 #include <string>
-using std::string;
 #include <vector>
+
+using std::string;
 using std::vector;
 
 void buildPrograms(ShaderPrograms& programs) {
@@ -14,22 +15,22 @@ void buildPrograms(ShaderPrograms& programs) {
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
 
     mesh_prog.Bind();
-    mesh_prog.RegisterUniform(0, "mvp");
-    mesh_prog.RegisterUniform(1, "mv");
-    mesh_prog.RegisterUniform(2, "base_color");
-    mesh_prog.RegisterUniform(3, "specular_color");
-    mesh_prog.RegisterUniform(4, "shine");
-    mesh_prog.RegisterUniform(5, "ambient");
-    mesh_prog.RegisterUniform(6, "shadow");
-    mesh_prog.RegisterUniform(7, "lightSpaceMatrix");
-    mesh_prog.RegisterUniform(8, "lightPosition");
-    mesh_prog.RegisterUniform(9, "lightConeAngle");
+    mesh_prog.RegisterUniform(0, "MVP");
+    mesh_prog.RegisterUniform(1, "MVP");
+    mesh_prog.RegisterUniform(2, "BaseColor");
+    mesh_prog.RegisterUniform(3, "SpecularColor");
+    mesh_prog.RegisterUniform(4, "Shine");
+    mesh_prog.RegisterUniform(5, "Ambient");
+    mesh_prog.RegisterUniform(6, "ShadowMap");
+    mesh_prog.RegisterUniform(7, "LightSpaceMatrix");
+    mesh_prog.RegisterUniform(8, "LightPosition");
+    mesh_prog.RegisterUniform(9, "LightConeAngle");
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     shadow_prog.BuildFiles("./shaders/shadow.vert", "./shaders/shadow.frag");
     shadow_prog.Bind();
-    shadow_prog.RegisterUniform(0, "mvp");
+    shadow_prog.RegisterUniform(0, "MVP");
 }
 
 struct MeshData loadMesh(cyGLSLProgram& prog, char* path) {
@@ -47,8 +48,8 @@ struct MeshData loadMesh(cyGLSLProgram& prog, char* path) {
         string specular_path = mesh.M(0).map_Ks.data;
         diffuse_path = "./assets/teapot/" + diffuse_path;
         specular_path = "./assets/teapot/" + specular_path;
-        loadTexture(prog, diffuse_path, (char*)"diffuse_tex", 0);
-        loadTexture(prog, specular_path, (char*)"specular_tex", 1);
+        loadTexture(prog, diffuse_path, (char*)"DiffuseTexture", 0);
+        loadTexture(prog, specular_path, (char*)"SpecularTexture", 1);
     }
 
     return md;
@@ -59,10 +60,10 @@ void bindMaterialProperties(cyGLSLProgram& prog, cyTriMesh& mesh) {
         //std::cout << "at least one material was detected." << std::endl;
         cyTriMesh::Mtl objMaterial = mesh.M(0);
 
-        prog.SetUniform3(2, objMaterial.Kd);
-        prog.SetUniform3(3, objMaterial.Ks);
-        prog.SetUniform(4, objMaterial.Ns);
-        prog.SetUniform3(5, objMaterial.Ka);
+        prog.SetUniform3("BaseColor", objMaterial.Kd);
+        prog.SetUniform3("SpecularColor", objMaterial.Ks);
+        prog.SetUniform("Shine", objMaterial.Ns);
+        prog.SetUniform3("Ambient", objMaterial.Ka);
     } else {
         //std::cout << "Using default material settings." << std::endl;
         // loadTexture(prog, "./assets/blank.png", (char*)"diffuse_tex", 0);
@@ -72,10 +73,10 @@ void bindMaterialProperties(cyGLSLProgram& prog, cyTriMesh& mesh) {
         float ns_default = 50.0;
         float ka_default[3] = {0.21, 0.21, 0.21};
 
-        prog.SetUniform3(2, kd_default);
-        prog.SetUniform3(3, ks_default);
-        prog.SetUniform(4, ns_default);
-        prog.SetUniform3(5, ka_default);
+        prog.SetUniform3("BaseColor", kd_default);
+        prog.SetUniform3("SpecularColor", ks_default);
+        prog.SetUniform("Shine", ns_default);
+        prog.SetUniform3("Ambient", ka_default);
     }
 }
 
@@ -183,11 +184,9 @@ struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
         indices.data(),
         GL_STATIC_DRAW
     );
-    std::cout << "Mesh EBO: " << EBO << std::endl;
 
     // Position attribute
-    GLuint pos_attrib = prog.AttribLocation("pos");
-    std::cout << "Pos attrib (from mesh): " << pos_attrib << std::endl;
+    GLuint pos_attrib = prog.AttribLocation("VertexPosition");
     glVertexAttribPointer(
         pos_attrib,
         3,
@@ -199,7 +198,7 @@ struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
     glEnableVertexAttribArray(pos_attrib);
 
     // Normal attribute
-    GLuint norm_attrib = prog.AttribLocation("norm");
+    GLuint norm_attrib = prog.AttribLocation("VertexNormal");
     glVertexAttribPointer(
         norm_attrib,
         3,
@@ -211,7 +210,7 @@ struct MeshData bindMeshVertexAttributes(cyGLSLProgram& prog, cyTriMesh& mesh) {
     glEnableVertexAttribArray(norm_attrib);
 
     // Texture coordinate attribute
-    GLuint txc_attrib = prog.AttribLocation("txc");
+    GLuint txc_attrib = prog.AttribLocation("VertexTexCoord");
     glVertexAttribPointer(
         txc_attrib,
         2,

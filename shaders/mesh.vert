@@ -1,26 +1,27 @@
 #version 410 core
 
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec3 norm;
-layout(location = 2) in vec2 txc;
-out vec3 normal;
-// out vec3 light_direction;
-out vec2 texCoord;
-out vec4 lightView_Position;
+layout(location = 0) in vec3 VertexPosition;
+layout(location = 1) in vec3 VertexNormal;
+layout(location = 2) in vec2 VertexTexCoord;
 
-out vec3 fragPosition;
-out mat3 normalMatrix;
+out vec3 Normal;
+out vec2 TexCoord;
+out vec4 LightViewPosition;
+out vec3 FragPosition;
+out mat3 NormalMatrix;
 
-uniform mat4 mvp;
-uniform mat4 mv;
-uniform mat4 lightSpaceMatrix;
-uniform vec3 lightPosition;
+uniform mat4 MVP;
+uniform mat4 MV;
+uniform mat4 LightSpaceMatrix;
+uniform vec3 LightPosition;
 
 void main() {
-    fragPosition = pos;
-    normalMatrix = transpose(inverse(mat3(mv)));
-    normal = normalize(normalMatrix * norm);
-    texCoord = txc;
-    gl_Position = mvp * vec4(pos, 1.0);
-    lightView_Position = lightSpaceMatrix * vec4(pos, 1);
+    FragPosition = VertexPosition;
+    LightViewPosition = LightSpaceMatrix * vec4(VertexPosition, 1);
+    // TODO: calculate in cpp and pass as uniform
+    NormalMatrix = transpose(inverse(mat3(MV)));
+    Normal = normalize(NormalMatrix * VertexNormal);
+    TexCoord = VertexTexCoord;
+
+    gl_Position = MVP * vec4(VertexPosition, 1.0);
 }

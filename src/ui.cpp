@@ -26,7 +26,7 @@ GLFWwindow* initAndCreateWindow() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow* window =
-        glfwCreateWindow(640, 550, "Project 7 - Shadow Mapping", NULL, NULL);
+        glfwCreateWindow(640, 550, "Final Project", NULL, NULL);
 
     if (!window) {
         std::cout << "Failed to create the window!" << std::endl;
@@ -113,11 +113,11 @@ void updateCamera(GLFWwindow* window, ShaderPrograms& programs) {
     programs.mesh.Bind();
     float mvp_array[16] = {0};
     finalTransform.Get(mvp_array);
-    programs.mesh.SetUniformMatrix4(0, mvp_array);
+    programs.mesh.SetUniformMatrix4("MVP", mvp_array);
 
     float mv_array[16] = {0};
     mv.Get(mv_array);
-    programs.mesh.SetUniformMatrix4(1, mv_array);
+    programs.mesh.SetUniformMatrix4("MV", mv_array);
 
     // programs.shadow.Bind();
     // programs.shadow.SetUniformMatrix4(0, mvp_array);

@@ -1,0 +1,11 @@
+CompileFlags:
+    Add:
+        - "-I../include"
+        - "-I/usr/local/include/"
+        - "-I/opt/homebrew/opt/glfw/include"
+        - "-std=c++23"
+        - "-Wall"
+        - "-Wextra"
+        - "-Wdeprecated-declarations"
+        - "-Wno-unused-parameter"
+        - "-fsanitize=address"

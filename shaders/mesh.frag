@@ -97,8 +97,8 @@ vec3 gooch_shade(LightData light, vec3 diffuse, vec3 specular, vec3 normal) {
     float gooch = (1.0f + dot(light.direction, normal)) / 2.0;
     gooch = gooch * max(light.visibility, 0.33);
     //vec3 gooch = gooch_amount + (fresnel(2.5, normal, VIEW_DIR) * light.color * FRESNEL_SCALE);
-    vec3 k_cool = mix(oklab_from_linear(K_COOL), oklab_from_linear(BaseColor), ALPHA);
-    vec3 k_warm = mix(oklab_from_linear(K_WARM), oklab_from_linear(BaseColor), BETA);
+    vec3 k_cool = mix(oklab_from_linear(K_COOL), oklab_from_linear(diffuse), ALPHA);
+    vec3 k_warm = mix(oklab_from_linear(K_WARM), oklab_from_linear(diffuse), BETA);
     vec3 gooch_diffuse = gooch * k_warm + (1 - gooch) * k_cool;
     gooch_diffuse = linear_from_oklab(gooch_diffuse);
 

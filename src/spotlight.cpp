@@ -81,7 +81,7 @@ GLuint SpotLight::getTextureID() {
 
 cyMatrix4f SpotLight::getLightSpaceMatrix() const {
     cyMatrix4f result =
-        cyMatrix4f::Translation(cyVec3f(0.5, 0.5, 0.5 - 0.0000005));
+        cyMatrix4f::Translation(cyVec3f(0.5, 0.5, 0.5 - 0.00002));
     result *= cyMatrix4f::Scale(0.5);
     result *= this->projection;
     return result;

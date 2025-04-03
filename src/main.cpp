@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 
 void animate_light(SpotLight& light, cyGLSLProgram& mesh_program) {
     double time = glfwGetTime();
-    light.origin = cyVec3f(sin(time) * 40, cos(time) * 40, 40);
+    light.origin = cyVec3f(sin(time) * 60, cos(time) * 60, 40);
     light.updateMVP();
     light.updateUniforms();
 }

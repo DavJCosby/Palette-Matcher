@@ -2,16 +2,16 @@
 # File Created: 08.02.2017 14:08:01
 
 newmtl default
-	Ns 20.00000000
+	Ns 70.00000000
 	Ni 1.50000000
 	d 1.00000000
 	Tr 0.00000000
 	Tf 1.00000000 1.00000000 1.00000000
 	illum 2
 	Ka 0.22980395 0.2000000 0.20000000
-	Kd 0.50980395 0.00000000 0.00000000
-	Ks 0.80099994 0.80099994 0.80099994
+	Kd 0.50980395 0.1000000 0.15000000
+	Ks 0.5 0.5 0.5
 	Ke 0.00000000 0.00000000 0.00000000
-	map_Ka brick.png
-	map_Kd brick.png
-	map_Ks brick-specular.png
+	map_Ka ../blank.png
+	map_Kd ../blank.png
+	map_Ks ../blank.png

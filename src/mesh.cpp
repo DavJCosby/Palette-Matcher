@@ -23,9 +23,9 @@ void Mesh::bindMaterialProperties(cyGLSLProgram& program) {
         program.SetUniform("Shine", objMaterial.Ns);
         program.SetUniform3("Ambient", objMaterial.Ka);
     } else {
-        float kd_default[3] = {0.25, 0.25, 0.25};
+        float kd_default[3] = {0.15, 0.15, 0.45};
         float ks_default[3] = {0.65, 0.65, 0.65};
-        float ns_default = 50.0;
+        float ns_default = 90.0;
         float ka_default[3] = {0.21, 0.21, 0.21};
 
         program.SetUniform3("BaseColor", kd_default);

@@ -8,10 +8,10 @@ static double lastMouseY;
 
 static float camRotX = 3.14;
 static float camRotY = 1.57;
-static float camDist = 35;
+static float camDist = 150;
 
-const float CAM_MIN_DIST = 10;
-const float CAM_MAX_DIST = 75;
+const float CAM_MIN_DIST = 50;
+const float CAM_MAX_DIST = 500;
 
 float deg2rad(float deg) {
     return deg * 3.145 / 180.0;
@@ -24,6 +24,7 @@ GLFWwindow* initAndCreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4); // MSAA 4x
 
     GLFWwindow* window =
         glfwCreateWindow(640, 550, "Final Project", NULL, NULL);
@@ -46,6 +47,8 @@ GLFWwindow* initAndCreateWindow() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_MULTISAMPLE);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     return window;
 }
@@ -85,7 +88,7 @@ void cursor_position_callback(GLFWwindow* window, double xPos, double yPos) {
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        camDist += deltaY * 0.25;
+        camDist += deltaY * 0.5;
         if (camDist < CAM_MIN_DIST) {
             camDist = CAM_MIN_DIST;
         }
@@ -106,10 +109,10 @@ void update_camera(GLFWwindow* window, ShaderPrograms& programs) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     cyMatrix4f projection = cy::Matrix4f::Perspective(
-        deg2rad(70.0),
+        deg2rad(10.0),
         (float)width / (float)height,
-        0.1f,
-        1000.0f
+        1.0f,
+        5000.0f
     );
 
     cyMatrix4f mv =

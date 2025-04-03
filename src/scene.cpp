@@ -8,21 +8,28 @@ Scene::Scene(ShaderPrograms& programs) :
     light(
         cyVec3f(0.0, -50.0, 40.0),
         cyVec3f(0.0, 0.0, 0.0),
-        45.0,
+        50.0,
         programs.shadow,
         programs.mesh,
-        1024,
-        1024
+        4096,
+        4096
     ),
     programs(programs) {
     programs.mesh.Bind();
+
+    Mesh duck(load_mesh(programs.mesh, (char*)"./assets/duck/duck.obj"), true);
 
     Mesh teapot(
         load_mesh(programs.mesh, (char*)"./assets/teapot/teapot.obj"),
         true
     );
-    Mesh plane(load_mesh(programs.mesh, (char*)"./assets/plane.obj"), false);
 
+    Mesh plane(
+        load_mesh(programs.mesh, (char*)"./assets/ground/hb1.obj"),
+        true
+    );
+
+    meshes.push_back(duck);
     meshes.push_back(teapot);
     meshes.push_back(plane);
 }

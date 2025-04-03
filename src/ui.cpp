@@ -49,7 +49,7 @@ GLFWwindow* initAndCreateWindow() {
     glDepthFunc(GL_LESS);
     glEnable(GL_MULTISAMPLE);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(64.0 / 255.0, 6.0 / 255.0, 191.0 / 255.0, 1.0f);
     return window;
 }
 

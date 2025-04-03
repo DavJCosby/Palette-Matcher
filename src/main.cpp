@@ -15,7 +15,7 @@
 #include "internal/spotlight.h"
 #include "internal/scene.h"
 
-#include <iostream>
+// #include <iostream>
 
 void animate_light(SpotLight& light, cyGLSLProgram& mesh_program);
 

@@ -80,7 +80,7 @@ vec3 gooch_shade(LightData light, vec3 albedo, vec3 specular, vec3 normal) {
     float gooch = (1.0f + dot(light.direction, normal)) / 2.0;
     gooch = gooch * max(light.visibility, 0.33); // darken in shadowed areas
 
-    // oklab yields more natural color interpolations
+    // oklab produces more natural color interpolations
     vec3 albedo_oklab = oklab_from_rgb(albedo);
     vec3 k_cool = mix(oklab_from_rgb(K_COOL), albedo_oklab, ALPHA); // TODO: precompute K_COOL/K_WARM oklabs once
     vec3 k_warm = mix(oklab_from_rgb(K_WARM), albedo_oklab, BETA);
@@ -90,7 +90,8 @@ vec3 gooch_shade(LightData light, vec3 albedo, vec3 specular, vec3 normal) {
     float reflect_amount = blinn_BRDF(light.direction, VIEW_DIR, normal);
     vec3 highlights = reflect_amount * specular
             * light.color
-            * dot_clamped(normal, light.direction) * vec3(1 + fresnel(2.5, normal, VIEW_DIR));
+            * dot_clamped(normal, light.direction)
+            * vec3(1 + fresnel(2.5, normal, VIEW_DIR) * FRESNEL_SCALE);
 
     return highlights + gooch_diffuse + fresnel(2.5, normal, VIEW_DIR) * light.color * FRESNEL_SCALE;
 }

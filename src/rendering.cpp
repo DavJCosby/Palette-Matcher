@@ -21,11 +21,10 @@ ShaderPrograms build_programs() {
     mesh_prog.RegisterUniform(2, "BaseColor");
     mesh_prog.RegisterUniform(3, "SpecularColor");
     mesh_prog.RegisterUniform(4, "Shine");
-    mesh_prog.RegisterUniform(5, "Ambient");
-    mesh_prog.RegisterUniform(6, "ShadowMap");
-    mesh_prog.RegisterUniform(7, "LightSpaceMatrix");
-    mesh_prog.RegisterUniform(8, "LightPosition");
-    mesh_prog.RegisterUniform(9, "LightConeAngle");
+    mesh_prog.RegisterUniform(5, "ShadowMap");
+    mesh_prog.RegisterUniform(6, "LightSpaceMatrix");
+    mesh_prog.RegisterUniform(7, "LightPosition");
+    mesh_prog.RegisterUniform(8, "LightConeAngle");
 
     programs.mesh.SetUniform("ShadowMap", 4); // shadow map is texture unit 4
 

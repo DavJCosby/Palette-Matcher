@@ -11,7 +11,6 @@ in mat3 NormalMatrix;
 uniform vec3 LightPosition;
 uniform vec3 BaseColor;
 uniform vec3 SpecularColor;
-uniform vec3 Ambient;
 uniform sampler2D DiffuseTexture;
 uniform sampler2D SpecularTexture;
 uniform sampler2DShadow ShadowMap;

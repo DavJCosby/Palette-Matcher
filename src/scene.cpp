@@ -1,10 +1,11 @@
 #include "internal/spotlight.h"
 #include "internal/rendering.h"
 #include "internal/scene.h"
+#include <OpenGL/gl.h>
 
 #include <iostream>
 
-Scene::Scene(ShaderPrograms& programs) :
+Scene::Scene(ShaderPrograms& programs, GLFWwindow* window) :
     light(
         cyVec3f(0.0, -50.0, 40.0),
         cyVec3f(0.0, 0.0, 0.0),
@@ -32,6 +33,19 @@ Scene::Scene(ShaderPrograms& programs) :
     meshes.push_back(duck);
     meshes.push_back(teapot);
     meshes.push_back(plane);
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    depth_texture.Initialize(
+        false, // depth comparison texture
+        2048, // width
+        2048 // height
+    );
+
+    depth_texture.SetTextureFilteringMode(GL_LINEAR, GL_LINEAR);
+
+    depth_texture.Bind();
 }
 
 Scene::~Scene() {
@@ -54,8 +68,22 @@ void Scene::drawShadowMap() {
 
 void Scene::drawMeshes() {
     programs.mesh.Bind();
-    glActiveTexture(GL_TEXTURE4);
+    glActiveTexture(GL_TEXTURE4); // shadow map
     glBindTexture(GL_TEXTURE_2D, light.getTextureID());
+
+    glActiveTexture(GL_TEXTURE6); // depth map
+    glBindTexture(GL_TEXTURE_2D, depth_texture.GetTextureID());
+
+    // first render to depth texture
+    depth_texture.Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (Mesh& mesh : meshes) {
+        mesh.bindMaterialProperties(programs.mesh);
+        mesh.draw();
+    }
+    depth_texture.Unbind();
+
+    // then render normal shading
     for (Mesh& mesh : meshes) {
         mesh.bindMaterialProperties(programs.mesh);
         mesh.draw();

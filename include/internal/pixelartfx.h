@@ -4,18 +4,24 @@
 
 #include <cy/cyCore.h>
 #include <cy/cyGL.h>
+#include "internal/scene.h"
 
 #include <GLFW/glfw3.h>
 
 class PixelArtEffect {
   private:
-    unsigned int framebuffer_ID;
-    unsigned int texture_ID;
-    unsigned int rbo_ID;
+    GLuint downscale_framebuffer_ID;
+    GLuint downscale_texture_ID;
+    GLuint outline_framebuffer_ID;
+    GLuint outline_texture_ID;
+    GLuint rbo_ID;
     int width;
     int height;
     GLFWwindow* window;
+
+    cyGLSLProgram outline_program;
     cyGLSLProgram upscale_program;
+    Scene& scene;
 
     // Simple quad for drawing the texture
     unsigned int quadVAO, quadVBO;
@@ -29,7 +35,9 @@ class PixelArtEffect {
     PixelArtEffect(
         GLFWwindow* window,
         int downscale_factor,
-        cyGLSLProgram& upscale_program
+        cyGLSLProgram& outline_program,
+        cyGLSLProgram& upscale_program,
+        Scene& scene
     );
     ~PixelArtEffect();
 

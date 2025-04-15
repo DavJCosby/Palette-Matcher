@@ -23,22 +23,20 @@ void animate_light(SpotLight& light, cyGLSLProgram& mesh_program);
 int main(int argc, char** argv) {
     GLFWwindow* window = initAndCreateWindow();
     ShaderPrograms programs = build_programs();
-    Scene scene(programs);
+    Scene scene(programs, window);
 
-    PixelArtEffect pixel_effect(window, 6, programs.screen);
+    PixelArtEffect
+        pixel_effect(window, 12, programs.outline, programs.screen, scene);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window, pixel_effect);
         update_camera(window, programs);
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        pixel_effect.setFramebufferSize();
-
         animate_light(scene.light, programs.mesh);
 
         scene.drawShadowMap();
 
+        pixel_effect.setFramebufferSize();
         pixel_effect.beginRender();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.drawMeshes();

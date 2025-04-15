@@ -13,6 +13,7 @@ ShaderPrograms build_programs() {
     ShaderPrograms programs;
     cyGLSLProgram& mesh_prog = programs.mesh;
     cyGLSLProgram& shadow_prog = programs.shadow;
+    cyGLSLProgram& outline_prog = programs.outline;
     cyGLSLProgram& screen_prog = programs.screen;
 
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
@@ -28,13 +29,20 @@ ShaderPrograms build_programs() {
     mesh_prog.RegisterUniform(7, "LightPosition");
     mesh_prog.RegisterUniform(8, "LightConeAngle");
 
-    programs.mesh.SetUniform("ShadowMap", 4); // shadow map is texture unit 4
+    mesh_prog.SetUniform("ShadowMap", 4); // shadow map is texture unit 4
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     shadow_prog.BuildFiles("./shaders/shadow.vert", "./shaders/shadow.frag");
     shadow_prog.Bind();
     shadow_prog.RegisterUniform(0, "MVP");
+
+    outline_prog.BuildFiles("./shaders/outline.vert", "./shaders/outline.frag");
+    outline_prog.Bind();
+    outline_prog.RegisterUniform(0, "screenTexture");
+    outline_prog.RegisterUniform(1, "depthTexture");
+    outline_prog.SetUniform("screenTexture", 5);
+    outline_prog.SetUniform("depthTexture", 6);
 
     screen_prog.BuildFiles("./shaders/screen.vert", "./shaders/screen.frag");
     screen_prog.Bind();

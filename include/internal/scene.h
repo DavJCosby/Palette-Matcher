@@ -14,8 +14,9 @@ class Scene {
     SpotLight light;
     vector<Mesh> meshes;
     ShaderPrograms& programs;
+    cyGLRenderDepth2D depth_texture;
 
-    Scene(ShaderPrograms& programs);
+    Scene(ShaderPrograms& programs, GLFWwindow* window);
     ~Scene();
 
     void drawShadowMap();

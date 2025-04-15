@@ -31,7 +31,7 @@ GLFWwindow* initAndCreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4); // MSAA 4x
+    glfwWindowHint(GLFW_SAMPLES, 16); // MSAA 16x
 
     GLFWwindow* window =
         glfwCreateWindow(640, 550, "Final Project", NULL, NULL);
@@ -93,7 +93,11 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
 
     if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) { // plus key
         if (plusKeyDebounce) {
-            pixel_art_effect.downscale_factor += 1;
+            pixel_art_effect.downscale_factor -= 1;
+
+            if (pixel_art_effect.downscale_factor < 1) {
+                pixel_art_effect.downscale_factor = 1;
+            }
             plusKeyDebounce = false;
             lastKey = time;
         }
@@ -101,11 +105,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
 
     if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
         if (minusKeyDebounce) {
-            pixel_art_effect.downscale_factor -= 1;
-
-            if (pixel_art_effect.downscale_factor < 1) {
-                pixel_art_effect.downscale_factor = 1;
-            }
+            pixel_art_effect.downscale_factor += 1;
             minusKeyDebounce = false;
             lastKey = time;
         }

@@ -14,6 +14,7 @@
 #include "internal/ui.h"
 #include "internal/spotlight.h"
 #include "internal/scene.h"
+#include "internal/pixelartfx.h"
 
 // #include <iostream>
 
@@ -24,15 +25,24 @@ int main(int argc, char** argv) {
     ShaderPrograms programs = build_programs();
     Scene scene(programs);
 
+    PixelArtEffect pixel_effect(window, 6, programs.screen);
+
     while (!glfwWindowShouldClose(window)) {
-        process_input(window);
+        process_input(window, pixel_effect);
         update_camera(window, programs);
-        update_viewport_size(window);
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        pixel_effect.setFramebufferSize();
+
         animate_light(scene.light, programs.mesh);
 
         scene.drawShadowMap();
+
+        pixel_effect.beginRender();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.drawMeshes();
+        pixel_effect.endRender();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

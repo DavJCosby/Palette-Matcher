@@ -7,14 +7,13 @@
 #include "rendering.h"
 #include <cy/cyVector.h>
 #include <cy/cyMatrix.h>
+#include "internal/pixelartfx.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 GLFWwindow* initAndCreateWindow();
 
-void update_viewport_size(GLFWwindow*);
-
-void process_input(GLFWwindow* window);
+void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect);
 
 void update_camera(GLFWwindow* window, ShaderPrograms& programs);
 

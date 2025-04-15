@@ -13,6 +13,8 @@ ShaderPrograms build_programs() {
     ShaderPrograms programs;
     cyGLSLProgram& mesh_prog = programs.mesh;
     cyGLSLProgram& shadow_prog = programs.shadow;
+    cyGLSLProgram& screen_prog = programs.screen;
+
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
 
     mesh_prog.Bind();
@@ -33,6 +35,11 @@ ShaderPrograms build_programs() {
     shadow_prog.BuildFiles("./shaders/shadow.vert", "./shaders/shadow.frag");
     shadow_prog.Bind();
     shadow_prog.RegisterUniform(0, "MVP");
+
+    screen_prog.BuildFiles("./shaders/screen.vert", "./shaders/screen.frag");
+    screen_prog.Bind();
+    screen_prog.RegisterUniform(0, "screenTexture");
+    screen_prog.SetUniform("screenTexture", 5);
 
     return programs;
 }

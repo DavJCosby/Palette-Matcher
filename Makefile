@@ -1,7 +1,7 @@
 
 BUILD_DIR = ./build
 
-OBJS = $(BUILD_DIR)/glad.o $(BUILD_DIR)/rendering.o $(BUILD_DIR)/ui.o $(BUILD_DIR)/spotlight.o $(BUILD_DIR)/scene.o $(BUILD_DIR)/mesh.o $(BUILD_DIR)/lodepng.o
+OBJS = $(BUILD_DIR)/glad.o $(BUILD_DIR)/rendering.o $(BUILD_DIR)/ui.o $(BUILD_DIR)/spotlight.o $(BUILD_DIR)/scene.o $(BUILD_DIR)/mesh.o $(BUILD_DIR)/lodepng.o $(BUILD_DIR)/pixelartfx.o
 EXECUTABLE_NAME = App.exe
 
 CC = g++
@@ -34,9 +34,12 @@ $(BUILD_DIR)/mesh.o: ./src/mesh.cpp
 $(BUILD_DIR)/spotlight.o: ./src/spotlight.cpp
 	$(CC) ./src/spotlight.cpp $(FULL_CC) -c -o $(BUILD_DIR)/spotlight.o
 
-
 $(BUILD_DIR)/rendering.o: ./src/rendering.cpp
 	$(CC) ./src/rendering.cpp $(FULL_CC) -c -o $(BUILD_DIR)/rendering.o
+
+$(BUILD_DIR)/pixelartfx.o: ./src/pixelartfx.cpp
+	$(CC) ./src/pixelartfx.cpp $(FULL_CC) -c -o $(BUILD_DIR)/pixelartfx.o
+
 
 fmt:
 	clang-format -i ./src/*.cpp ./include/internal/*

@@ -10,6 +10,13 @@ static float camRotX = 3.14;
 static float camRotY = 1.57;
 static float camDist = 150;
 
+static bool plusKeyDebounce = true;
+static bool minusKeyDebounce = true;
+
+static double lastKey = 0;
+
+const double KEY_REPEAT_INTERVAL = 0.25;
+
 const float CAM_MIN_DIST = 50;
 const float CAM_MAX_DIST = 500;
 
@@ -53,13 +60,7 @@ GLFWwindow* initAndCreateWindow() {
     return window;
 }
 
-void update_viewport_size(GLFWwindow* window) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-}
-
-void process_input(GLFWwindow* window) {
+void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
@@ -75,6 +76,38 @@ void process_input(GLFWwindow* window) {
         camDist += 0.5;
         if (camDist > CAM_MAX_DIST) {
             camDist = CAM_MAX_DIST;
+        }
+    }
+
+    double time = glfwGetTime();
+
+    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_RELEASE
+        || time - lastKey > KEY_REPEAT_INTERVAL) {
+        plusKeyDebounce = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_RELEASE
+        || time - lastKey > KEY_REPEAT_INTERVAL) {
+        minusKeyDebounce = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) { // plus key
+        if (plusKeyDebounce) {
+            pixel_art_effect.downscale_factor += 1;
+            plusKeyDebounce = false;
+            lastKey = time;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+        if (minusKeyDebounce) {
+            pixel_art_effect.downscale_factor -= 1;
+
+            if (pixel_art_effect.downscale_factor < 1) {
+                pixel_art_effect.downscale_factor = 1;
+            }
+            minusKeyDebounce = false;
+            lastKey = time;
         }
     }
 }

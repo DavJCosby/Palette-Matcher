@@ -11,9 +11,9 @@ PixelArtEffect::PixelArtEffect(
     rbo_ID(0),
     width(0),
     height(0),
-    downscale_factor(downscale_factor),
     window(window),
-    upscale_program(upscale_program) {
+    upscale_program(upscale_program),
+    downscale_factor(downscale_factor) {
     setupQuad();
 }
 

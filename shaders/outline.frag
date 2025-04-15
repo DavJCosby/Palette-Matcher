@@ -5,16 +5,17 @@ out vec4 FragColor;
 uniform sampler2D screenTexture;
 uniform sampler2D depthTexture;
 
-const float EDGE_THRESHOLD = 0.0015;
-const vec3 EDGE_COLOR = vec3(0.0, 0.0, 0.0);
+const float EDGE_THRESHOLD = 0.003;
+const float EDGE_THRESHOLD_FEATHER = 0.00225;
+const vec3 EDGE_COLOR = vec3(0.1, 0.0, 0.2);
 
-const float STROKE_RADIUS = 0.5;
+const float STROKE_RADIUS = 0.6;
 
-float depthToUnitRange(float depth) {
+float linearize_depth(float depth) {
     float near = 1.0;
     float far = 500.0;
-    float linearDepth = (2.0 * near) / (far + near - depth * (far - near));
-    return linearDepth;
+    float linear_depth = (2.0 * near) / (far + near - depth * (far - near));
+    return linear_depth;
 }
 
 vec4 applyEdges(vec4 base_color) {
@@ -22,14 +23,14 @@ vec4 applyEdges(vec4 base_color) {
     float pixelSizeY = STROKE_RADIUS / textureSize(screenTexture, 0).y;
 
     // Sample neighboring pixels
-    float leftDepth = depthToUnitRange(texture(depthTexture, TexCoord + vec2(-pixelSizeX, 0.0)).r);
-    float rightDepth = depthToUnitRange(texture(depthTexture, TexCoord + vec2(pixelSizeX, 0.0)).r);
-    float topDepth = depthToUnitRange(texture(depthTexture, TexCoord + vec2(0.0, pixelSizeY)).r);
-    float bottomDepth = depthToUnitRange(texture(depthTexture, TexCoord + vec2(0.0, -pixelSizeY)).r);
+    float leftDepth = linearize_depth(texture(depthTexture, TexCoord + vec2(-pixelSizeX, 0.0)).r);
+    float rightDepth = linearize_depth(texture(depthTexture, TexCoord + vec2(pixelSizeX, 0.0)).r);
+    float topDepth = linearize_depth(texture(depthTexture, TexCoord + vec2(0.0, pixelSizeY)).r);
+    float bottomDepth = linearize_depth(texture(depthTexture, TexCoord + vec2(0.0, -pixelSizeY)).r);
 
     // Calculate depth differences (gradient)
     float horizontalDiff = abs(rightDepth - leftDepth);
-    float verticalDiff = abs(topDepth - bottomDepth) * 0.5;
+    float verticalDiff = abs(topDepth - bottomDepth);
 
     // Combine the differences to get the edge intensity
     float edgeIntensity = max(horizontalDiff, verticalDiff);
@@ -37,11 +38,15 @@ vec4 applyEdges(vec4 base_color) {
 
     // Apply edge detection
     if (edgeIntensity > EDGE_THRESHOLD) {
-
         // This pixel is on an edge - draw it with the edge color
         return vec4(EDGE_COLOR, 1);
     } else {
-        return base_color;
+        if (edgeIntensity > EDGE_THRESHOLD_FEATHER) {
+            float amount = (edgeIntensity - EDGE_THRESHOLD_FEATHER) / (EDGE_THRESHOLD - EDGE_THRESHOLD_FEATHER);
+            return mix(base_color, vec4(EDGE_COLOR, 1), amount);
+        } else {
+            return base_color;
+        }
     }
 }
 

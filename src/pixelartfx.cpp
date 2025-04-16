@@ -208,11 +208,9 @@ void PixelArtEffect::endRender() {
 
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, downscale_texture_ID);
-    //outline_program.SetUniform("ScreenTexture", 5);
 
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D, scene.depth_texture.GetTextureID());
-    //outline_program.SetUniform("DepthTexture", 6);
 
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -226,7 +224,6 @@ void PixelArtEffect::endRender() {
 
     glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, outline_texture_ID);
-    //upscale_program.SetUniform("ScreenTexture", 7);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

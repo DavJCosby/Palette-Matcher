@@ -7,44 +7,118 @@ uniform sampler2D DepthTexture;
 
 const float EDGE_THRESHOLD = 0.003;
 const float EDGE_THRESHOLD_FEATHER = 0.00225;
-const vec3 EDGE_COLOR = vec3(0.1, 0.0, 0.2);
+const vec3 EDGE_COLOR = vec3(0, 0, 0);
 const float STROKE_RADIUS = 0.55;
 
-const vec3[5] PALETTE = vec3[5](vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), vec3(1, 1, 1));
-const int BAYER_N = 2;
+const vec3[] PALETTE = vec3[](
+        vec3(113, 0, 66) / 255,
+        vec3(174, 40, 80) / 255,
+        vec3(229, 88, 123) / 255,
+        vec3(236, 141, 161) / 255,
+        vec3(251, 204, 220) / 255,
+        vec3(255, 255, 255) / 255,
+
+        vec3(149, 238, 244) / 255,
+        vec3(120, 211, 216) / 255,
+        vec3(0, 181, 174) / 255,
+        vec3(1, 124, 131) / 255,
+        vec3(0, 84, 101) / 255,
+        vec3(0, 0, 0) / 255
+    );
+
+// const vec3[] PALETTE = vec3[](
+//         vec3(43, 15, 84) / 255,
+//         vec3(171, 31, 101) / 255,
+//         vec3(255, 79, 105) / 255,
+//         vec3(255, 247, 248) / 255,
+//         vec3(255, 129, 66) / 255,
+//         vec3(255, 218, 69) / 255,
+//         vec3(51, 104, 220) / 255,
+//         vec3(73, 231, 236) / 255
+//     );
+
+const int BAYER_N = 4;
 const int BAYER_N_SQ = BAYER_N * BAYER_N;
-const int BAYER_MATRIX[BAYER_N_SQ] = int[BAYER_N_SQ](0, 2, 3, 1);
+const int BAYER_MATRIX[BAYER_N_SQ] = int[BAYER_N_SQ](
+        0, 8, 2, 10,
+        12, 4, 14, 6,
+        3, 11, 1, 9,
+        15, 7, 13, 5
+    );
 
 // FORWARD DECLARATIONS - OUTLINES
 void apply_edges();
 float linearize_depth(float depth);
 
+// FORWARD DECLARATIONS - UTILITY FUNCTIONS
+vec3 oklab_from_rgb(vec3 rgb);
+vec3 rgb_from_oklab(vec3 oklab);
+
 // FORWARD DECLARATIONS - PALETTE MATCHING
-vec3 closest_candiate(vec3 target) {
-    float dist = 10000.0;
-    vec3 closest = vec3(1, 0, 1);
+vec3 closest_candiate(vec3[PALETTE.length()] palette, vec3 target) {
+    vec3 closest;
+    float dist_of_closest = 100000000.0;
 
     for (int i = 0; i < PALETTE.length(); i++) {
-        vec3 color = PALETTE[i];
-        float current_dist = length(target - color);
-        if (current_dist < dist) {
-            dist = current_dist;
+        vec3 color = palette[i];
+        vec3 delta = color - target;
+        float d = dot(delta, delta);
+        if (d < dist_of_closest) {
+            dist_of_closest = d;
             closest = color;
         }
     }
     return closest;
 }
-// FORWARD DECLARATIONS - UTILITY FUNCTIONS
-vec3 oklab_from_rgb(vec3 rgb);
-vec3 rgb_from_oklab(vec3 oklab);
+
+const float DITHER = 0.003;
+
+void lock_to_palette() {
+    ivec2 pixel_coordinate = ivec2(gl_FragCoord.xy);
+    vec3 original_color = FragColor.rgb;
+    vec3 original_oklab = oklab_from_rgb(FragColor.rgb);
+
+    vec3[PALETTE.length()] palette_oklab;
+
+    for (int i = 0; i < PALETTE.length(); i++) {
+        palette_oklab[i] = oklab_from_rgb(PALETTE[i]);
+    }
+
+    vec3 error = vec3(0, 0, 0);
+
+    vec3[BAYER_N_SQ] candidates;
+
+    for (int j = 0; j < BAYER_N_SQ; j++) {
+        vec3 sample_c = original_oklab + error * DITHER;
+        vec3 candidate = closest_candiate(palette_oklab, sample_c);
+        candidates[j] = candidate;
+        error += (original_color - candidate);
+    }
+
+    // sort by ascending lightness
+    for (int i = 0; i < BAYER_N_SQ - 1; i++) {
+        for (int j = 0; j < BAYER_N_SQ - i - 1; j++) {
+            if (candidates[j].x > candidates[j + 1].x) {
+                vec3 temp = candidates[j];
+                candidates[j] = candidates[j + 1];
+                candidates[j + 1] = temp;
+            }
+        }
+    }
+
+    int index_row = pixel_coordinate.x % BAYER_N;
+    int index_col = pixel_coordinate.y % BAYER_N;
+    int index = (index_row * BAYER_N) + index_col;
+
+    vec3 closest_match_rgb = rgb_from_oklab(candidates[BAYER_MATRIX[index]]);
+
+    FragColor = vec4(closest_match_rgb, 1);
+}
 
 void main() {
     FragColor = texture(ScreenTexture, TexCoord);
     apply_edges();
-    vec2 pixel_coordinate = floor(TexCoord * textureSize(ScreenTexture, 0));
-    highp int index = int(pixel_coordinate.x + pixel_coordinate.y);
-
-    FragColor = vec4(closest_candiate(FragColor.rgb), 1);
+    lock_to_palette();
 }
 
 // OUTLINES

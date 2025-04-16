@@ -39,15 +39,15 @@ ShaderPrograms build_programs() {
 
     outline_prog.BuildFiles("./shaders/outline.vert", "./shaders/outline.frag");
     outline_prog.Bind();
-    outline_prog.RegisterUniform(0, "screenTexture");
-    outline_prog.RegisterUniform(1, "depthTexture");
-    outline_prog.SetUniform("screenTexture", 5);
-    outline_prog.SetUniform("depthTexture", 6);
+    outline_prog.RegisterUniform(0, "ScreenTexture");
+    outline_prog.RegisterUniform(1, "DepthTexture");
+    outline_prog.SetUniform("ScreenTexture", 5);
+    outline_prog.SetUniform("DepthTexture", 6);
 
     screen_prog.BuildFiles("./shaders/screen.vert", "./shaders/screen.frag");
     screen_prog.Bind();
-    screen_prog.RegisterUniform(0, "screenTexture");
-    screen_prog.SetUniform("screenTexture", 5);
+    screen_prog.RegisterUniform(0, "ScreenTexture");
+    screen_prog.SetUniform("ScreenTexture", 7);
 
     return programs;
 }

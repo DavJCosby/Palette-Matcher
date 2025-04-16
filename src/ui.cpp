@@ -34,7 +34,7 @@ GLFWwindow* initAndCreateWindow() {
     glfwWindowHint(GLFW_SAMPLES, 8); // MSAA 8x
 
     GLFWwindow* window =
-        glfwCreateWindow(640, 550, "Final Project", NULL, NULL);
+        glfwCreateWindow(960, 720, "Final Project", NULL, NULL);
 
     if (!window) {
         std::cout << "Failed to create the window!" << std::endl;

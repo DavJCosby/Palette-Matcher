@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     Scene scene(programs, window);
 
     PixelArtEffect
-        pixel_effect(window, 9, programs.outline, programs.screen, scene);
+        pixel_effect(window, 6, programs.outline, programs.screen, scene);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window, pixel_effect);

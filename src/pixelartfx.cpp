@@ -201,52 +201,32 @@ void PixelArtEffect::beginRender() {
 }
 
 void PixelArtEffect::endRender() {
-    // We finished rendering the scene to our low-res framebuffer
-
-    // STEP 1: Apply outline post-processing
+    // OUTLINE POST-PROCESSING
     glBindFramebuffer(GL_FRAMEBUFFER, outline_framebuffer_ID);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    // Set up the outline shader
     outline_program.Bind();
 
-    // Bind our scene texture to texture unit 0
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, downscale_texture_ID);
-    outline_program.SetUniform("screenTexture", 5);
+    //outline_program.SetUniform("ScreenTexture", 5);
 
-    //If your outline shader also needs a depth texture
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D, scene.depth_texture.GetTextureID());
-    outline_program.SetUniform("depthTexture", 6);
+    //outline_program.SetUniform("DepthTexture", 6);
 
-    // Draw the fullscreen quad with the outline shader
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // STEP 2: Render to screen with upscaling
-    // Switch to default framebuffer
-    // Use the upscaling shader
+    // UPSCALE TO FILL CANVAS
     upscale_program.Bind();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Get window dimensions for viewport
-    int window_width, window_height;
-    glfwGetFramebufferSize(window, &window_width, &window_height);
-    glViewport(0, 0, window_width, window_height);
-
-    // Clear the screen
+    glViewport(0, 0, width * downscale_factor, height * downscale_factor);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Bind the outlined texture to texture unit 7
     glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, outline_texture_ID);
-    upscale_program.SetUniform("screenTexture", 7);
+    //upscale_program.SetUniform("ScreenTexture", 7);
 
-    // Draw fullscreen quad with nearest neighbor sampling for pixelated look
-    glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // Re-enable depth testing for 3D rendering
-    glEnable(GL_DEPTH_TEST);
 }

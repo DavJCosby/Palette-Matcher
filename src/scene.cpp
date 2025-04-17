@@ -30,9 +30,15 @@ Scene::Scene(ShaderPrograms& programs, GLFWwindow* window) :
         true
     );
 
+    // Mesh rocks(
+    //     load_mesh(programs.mesh, (char*)"./assets/rocks/rocks.obj"),
+    //     true
+    // );
+
     meshes.push_back(duck);
     meshes.push_back(teapot);
     meshes.push_back(plane);
+    // meshes.push_back(rocks);
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);

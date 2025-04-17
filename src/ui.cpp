@@ -15,7 +15,7 @@ static bool minusKeyDebounce = true;
 static bool tKeyDebounce = true;
 static bool togglePalette = true;
 
-static float dither = 0.003;
+static float dither = 0.0035f;
 
 static double lastKey = 0;
 

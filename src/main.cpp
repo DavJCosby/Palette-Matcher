@@ -37,12 +37,11 @@ int main(int argc, char** argv) {
     Scene scene(programs, window);
 
     PixelArtEffect
-        pixel_effect(window, 6, programs.outline, programs.screen, scene);
+        pixel_effect(window, 6, programs.pixelart, programs.upscale, scene);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window, pixel_effect);
         update_camera(window, programs);
-
         animate_light(scene.light, programs.mesh);
 
         scene.drawShadowMap();
@@ -64,8 +63,8 @@ int main(int argc, char** argv) {
 
 void compile_palette_into_fragshader(char** argv) {
     std::string palette_str = PaletteParser::generate_code_insert(argv[1]);
-    std::ifstream inFile("./shaders/outline.frag");
-    std::ofstream outFile("./shaders/outline-compiled.frag");
+    std::ifstream inFile("./shaders/pixelart.frag");
+    std::ofstream outFile("./shaders/pixelart-compiled.frag");
 
     if (inFile.is_open() && outFile.is_open()) {
         std::string line;
@@ -86,7 +85,7 @@ void animate_light(SpotLight& light, cyGLSLProgram& mesh_program) {
     double time2 = glfwGetTime() * 4;
 
     light.origin =
-        cyVec3f(sin(time) * 60, cos(time) * 60, 25 + 10 * cos(time2));
+        cyVec3f(sin(time) * 60, cos(time) * 60, 35 + 10 * cos(time2));
     light.updateMVP();
     light.updateUniforms();
 }

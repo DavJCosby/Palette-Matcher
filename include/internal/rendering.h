@@ -19,8 +19,8 @@ struct MaterialData {};
 struct ShaderPrograms {
     cyGLSLProgram mesh;
     cyGLSLProgram shadow;
-    cyGLSLProgram outline;
-    cyGLSLProgram screen;
+    cyGLSLProgram pixelart;
+    cyGLSLProgram upscale;
 };
 
 ShaderPrograms build_programs();

@@ -13,8 +13,8 @@ ShaderPrograms build_programs() {
     ShaderPrograms programs;
     cyGLSLProgram& mesh_prog = programs.mesh;
     cyGLSLProgram& shadow_prog = programs.shadow;
-    cyGLSLProgram& outline_prog = programs.outline;
-    cyGLSLProgram& screen_prog = programs.screen;
+    cyGLSLProgram& pixelart_prog = programs.pixelart;
+    cyGLSLProgram& upscale_prog = programs.upscale;
 
     mesh_prog.BuildFiles("./shaders/mesh.vert", "./shaders/mesh.frag");
 
@@ -37,25 +37,25 @@ ShaderPrograms build_programs() {
     shadow_prog.Bind();
     shadow_prog.RegisterUniform(0, "MVP");
 
-    outline_prog.BuildFiles(
-        "./shaders/outline.vert",
-        "./shaders/outline-compiled.frag"
+    pixelart_prog.BuildFiles(
+        "./shaders/pixelart.vert",
+        "./shaders/pixelart-compiled.frag"
     );
-    outline_prog.Bind();
-    outline_prog.RegisterUniform(0, "ScreenTexture");
-    outline_prog.RegisterUniform(1, "DepthTexture");
-    outline_prog.RegisterUniform(2, "TogglePalette");
-    outline_prog.RegisterUniform(3, "Dither");
+    pixelart_prog.Bind();
+    pixelart_prog.RegisterUniform(0, "ScreenTexture");
+    pixelart_prog.RegisterUniform(1, "DepthTexture");
+    pixelart_prog.RegisterUniform(2, "TogglePalette");
+    pixelart_prog.RegisterUniform(3, "Dither");
 
-    outline_prog.SetUniform("ScreenTexture", 5);
-    outline_prog.SetUniform("DepthTexture", 6);
-    outline_prog.SetUniform("TogglePalette", 1);
-    outline_prog.SetUniform("Dither", 0.003f);
+    pixelart_prog.SetUniform("ScreenTexture", 5);
+    pixelart_prog.SetUniform("DepthTexture", 6);
+    pixelart_prog.SetUniform("TogglePalette", 1);
+    pixelart_prog.SetUniform("Dither", 0.0035f);
 
-    screen_prog.BuildFiles("./shaders/screen.vert", "./shaders/screen.frag");
-    screen_prog.Bind();
-    screen_prog.RegisterUniform(0, "ScreenTexture");
-    screen_prog.SetUniform("ScreenTexture", 7);
+    upscale_prog.BuildFiles("./shaders/upscale.vert", "./shaders/upscale.frag");
+    upscale_prog.Bind();
+    upscale_prog.RegisterUniform(0, "ScreenTexture");
+    upscale_prog.SetUniform("ScreenTexture", 7);
 
     return programs;
 }

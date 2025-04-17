@@ -1,2 +1,4 @@
+A few good color palettes for demos:
 https://lospec.com/palette-list/fading-16
 https://lospec.com/palette-list/arch
+https://lospec.com/palette-list/leopolds-dreams

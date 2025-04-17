@@ -1,5 +1,4 @@
 #include "internal/pixelartfx.h"
-#include <iostream>
 #include "internal/scene.h"
 
 PixelArtEffect::PixelArtEffect(
@@ -40,9 +39,8 @@ PixelArtEffect::~PixelArtEffect() {
 }
 
 void PixelArtEffect::setupQuad() {
-    // Vertices for a quad that covers the entire screen
     float quadVertices[] = {
-        // positions        // texture coords
+        // POSITIONS       // TEXTURE COORDS
         -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
         1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
     };
@@ -79,7 +77,9 @@ void PixelArtEffect::setupQuad() {
 }
 
 void PixelArtEffect::createFramebuffer(int w, int h) {
-    // Delete old framebuffers if they exist
+    width = w;
+    height = h;
+
     if (downscale_framebuffer_ID) {
         glDeleteFramebuffers(1, &downscale_framebuffer_ID);
         glDeleteTextures(1, &downscale_texture_ID);
@@ -90,14 +90,10 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         glDeleteTextures(1, &outline_texture_ID);
     }
 
-    width = w;
-    height = h;
-
-    // Create downscale framebuffer
+    // RESCALING FRAMEBUFFER
     glGenFramebuffers(1, &downscale_framebuffer_ID);
     glBindFramebuffer(GL_FRAMEBUFFER, downscale_framebuffer_ID);
 
-    // Create color texture for the downscale framebuffer
     glGenTextures(1, &downscale_texture_ID);
     glBindTexture(GL_TEXTURE_2D, downscale_texture_ID);
     glTexImage2D(
@@ -112,11 +108,9 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         NULL
     );
 
-    // Use nearest neighbor filtering for pixel art effect
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Attach texture to framebuffer
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0,
@@ -125,7 +119,6 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         0
     );
 
-    // Create renderbuffer for depth and stencil
     glGenRenderbuffers(1, &rbo_ID);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo_ID);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
@@ -136,16 +129,10 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         rbo_ID
     );
 
-    // Check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "ERROR: Downscale framebuffer not complete!" << std::endl;
-    }
-
-    // Create outline framebuffer
+    // OUTLINE FRAMEBUFFER
     glGenFramebuffers(1, &outline_framebuffer_ID);
     glBindFramebuffer(GL_FRAMEBUFFER, outline_framebuffer_ID);
 
-    // Create color texture for the outline framebuffer
     glGenTextures(1, &outline_texture_ID);
     glBindTexture(GL_TEXTURE_2D, outline_texture_ID);
     glTexImage2D(
@@ -160,11 +147,9 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         NULL
     );
 
-    // Use nearest neighbor filtering for pixel art effect
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Attach texture to framebuffer
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0,
@@ -173,24 +158,18 @@ void PixelArtEffect::createFramebuffer(int w, int h) {
         0
     );
 
-    // Check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "ERROR: Outline framebuffer not complete!" << std::endl;
-    }
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void PixelArtEffect::setFramebufferSize() {
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
-    // Check if size changed or downscale factor changed
-    int newWidth = fbWidth / downscale_factor;
-    int newHeight = fbHeight / downscale_factor;
+    int new_width = fb_width / downscale_factor;
+    int new_height = fb_height / downscale_factor;
 
-    if (newWidth != width || newHeight != height) {
-        createFramebuffer(newWidth, newHeight);
+    if (new_width != width || new_height != height) {
+        createFramebuffer(new_width, new_height);
     }
 }
 

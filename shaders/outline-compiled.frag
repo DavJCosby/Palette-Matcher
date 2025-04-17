@@ -13,7 +13,20 @@ const float STROKE_RADIUS = 0.55;
 // On program startup, a palette text file is provided
 // and is parsed into a constant that is placed below.
 
-/*!AUTO GENERATED PALETTE CONSTANT!*/
+const vec3[] PALETTE = vec3[](
+	vec3(0.591267, 0.007236, -0.031458),
+	vec3(0.661239, 0.003510, -0.051761),
+	vec3(0.707165, 0.006057, -0.065566),
+	vec3(0.763112, 0.003352, -0.057338),
+	vec3(0.790501, 0.008863, -0.047014),
+	vec3(0.825614, 0.017907, -0.038741),
+	vec3(0.851626, 0.014828, -0.031222),
+	vec3(0.914045, 0.024313, -0.016000),
+	vec3(0.939287, 0.028037, 0.008229),
+	vec3(0.973370, 0.007475, 0.014161),
+	vec3(0.997624, 0.000327, -0.001112)
+);
+
 
 const int BAYER_N = 4;
 const int BAYER_N_SQ = BAYER_N * BAYER_N;

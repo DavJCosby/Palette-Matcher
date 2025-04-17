@@ -15,18 +15,48 @@
 #include "internal/spotlight.h"
 #include "internal/scene.h"
 #include "internal/pixelartfx.h"
+#include "internal/paletteparser.h"
 
 // #include <iostream>
 
 void animate_light(SpotLight& light, cyGLSLProgram& mesh_program);
 
+void compile_palette_into_fragshader(char** argv) {
+    std::string palette_str = PaletteParser::generate_code_insert(argv[1]);
+    std::ifstream inFile("./shaders/outline.frag");
+    std::ofstream outFile("./shaders/outline-compiled.frag");
+
+    if (inFile.is_open() && outFile.is_open()) {
+        std::string line;
+        while (getline(inFile, line)) {
+            size_t pos = line.find("/*!AUTO GENERATED PALETTE CONSTANT!*/");
+            if (pos != std::string::npos) {
+                line.replace(pos, 37, palette_str);
+            }
+            outFile << line << std::endl;
+        }
+        inFile.close();
+        outFile.close();
+    }
+}
+
 int main(int argc, char** argv) {
+    if (argc < 2) {
+        std::cerr
+            << "Must provide a path to some txt file of color palette hex values."
+            << std::endl;
+        exit(1);
+    }
+    compile_palette_into_fragshader(argv);
+
     GLFWwindow* window = initAndCreateWindow();
     ShaderPrograms programs = build_programs();
     Scene scene(programs, window);
 
+    // Copy the outline fragment shader with the auto-generated palette constants
+
     PixelArtEffect
-        pixel_effect(window, 6, programs.outline, programs.screen, scene);
+        pixel_effect(window, 9, programs.outline, programs.screen, scene);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window, pixel_effect);

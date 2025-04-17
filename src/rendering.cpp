@@ -37,7 +37,10 @@ ShaderPrograms build_programs() {
     shadow_prog.Bind();
     shadow_prog.RegisterUniform(0, "MVP");
 
-    outline_prog.BuildFiles("./shaders/outline.vert", "./shaders/outline.frag");
+    outline_prog.BuildFiles(
+        "./shaders/outline.vert",
+        "./shaders/outline-compiled.frag"
+    );
     outline_prog.Bind();
     outline_prog.RegisterUniform(0, "ScreenTexture");
     outline_prog.RegisterUniform(1, "DepthTexture");

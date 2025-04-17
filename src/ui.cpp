@@ -12,6 +12,8 @@ static float camDist = 150;
 
 static bool plusKeyDebounce = true;
 static bool minusKeyDebounce = true;
+static bool tKeyDebounce = true;
+static bool togglePalette = true;
 
 static double lastKey = 0;
 
@@ -61,10 +63,12 @@ GLFWwindow* initAndCreateWindow() {
 }
 
 void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
+    // ESCAPE TO CLOSE WINDOW
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
+    // I/O TO ZOOM IN/OUT
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
         camDist -= 0.5;
         if (camDist < CAM_MIN_DIST) {
@@ -81,6 +85,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
 
     double time = glfwGetTime();
 
+    // PLUS/MINUS TO CHANGE PIXELATION SCALE
     if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_RELEASE
         || time - lastKey > KEY_REPEAT_INTERVAL) {
         plusKeyDebounce = true;
@@ -109,6 +114,22 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
             minusKeyDebounce = false;
             lastKey = time;
         }
+    }
+
+    // T TO TOGGLE PALETTE MATCHING
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        if (tKeyDebounce) {
+            togglePalette = !togglePalette;
+            pixel_art_effect.outline_program.SetUniform(
+                "TogglePalette",
+                togglePalette ? 1 : 0
+            );
+            tKeyDebounce = false;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
+        tKeyDebounce = true;
     }
 }
 

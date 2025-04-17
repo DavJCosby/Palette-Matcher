@@ -79,8 +79,5 @@ string PaletteParser::generate_code_insert(const string& filename) {
     }
 
     palette_txt += "\n);\n";
-
-    std::cout << palette_txt << std::endl;
-
     return palette_txt;
 }

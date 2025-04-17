@@ -4,6 +4,7 @@ out vec4 FragColor;
 
 uniform sampler2D ScreenTexture;
 uniform sampler2D DepthTexture;
+uniform int TogglePalette;
 
 const float EDGE_THRESHOLD = 0.003;
 const float EDGE_THRESHOLD_FEATHER = 0.00225;
@@ -102,7 +103,9 @@ void lock_to_palette() {
 void main() {
     FragColor = texture(ScreenTexture, TexCoord);
     apply_edges();
-    lock_to_palette();
+    if (TogglePalette == 1) {
+        lock_to_palette();
+    }
 }
 
 // OUTLINES

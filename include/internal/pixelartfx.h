@@ -19,8 +19,11 @@ class PixelArtEffect {
     int height;
     GLFWwindow* window;
 
+  public:
     cyGLSLProgram outline_program;
     cyGLSLProgram upscale_program;
+
+  private:
     Scene& scene;
 
     // Simple quad for drawing the texture

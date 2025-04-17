@@ -5,6 +5,7 @@ out vec4 FragColor;
 uniform sampler2D ScreenTexture;
 uniform sampler2D DepthTexture;
 uniform int TogglePalette;
+uniform float Dither;
 
 const float EDGE_THRESHOLD = 0.003;
 const float EDGE_THRESHOLD_FEATHER = 0.00225;
@@ -37,8 +38,6 @@ const int BAYER_MATRIX[BAYER_N_SQ] = int[BAYER_N_SQ](
         3, 11, 1, 9,
         15, 7, 13, 5
     );
-
-const float DITHER = 0.003;
 
 // FORWARD DECLARATIONS - OUTLINES
 void apply_edges();
@@ -74,7 +73,7 @@ void lock_to_palette() {
     vec3[BAYER_N_SQ] candidates;
 
     for (int j = 0; j < BAYER_N_SQ; j++) {
-        vec3 sample_c = original_oklab + error * DITHER;
+        vec3 sample_c = original_oklab + error * Dither;
         vec3 candidate = closest_candiate(sample_c);
         candidates[j] = candidate;
         error += (original_color - candidate);

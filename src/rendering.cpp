@@ -45,9 +45,12 @@ ShaderPrograms build_programs() {
     outline_prog.RegisterUniform(0, "ScreenTexture");
     outline_prog.RegisterUniform(1, "DepthTexture");
     outline_prog.RegisterUniform(2, "TogglePalette");
+    outline_prog.RegisterUniform(3, "Dither");
+
     outline_prog.SetUniform("ScreenTexture", 5);
     outline_prog.SetUniform("DepthTexture", 6);
     outline_prog.SetUniform("TogglePalette", 1);
+    outline_prog.SetUniform("Dither", 0.003f);
 
     screen_prog.BuildFiles("./shaders/screen.vert", "./shaders/screen.frag");
     screen_prog.Bind();

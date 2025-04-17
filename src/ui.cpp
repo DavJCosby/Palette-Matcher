@@ -15,6 +15,8 @@ static bool minusKeyDebounce = true;
 static bool tKeyDebounce = true;
 static bool togglePalette = true;
 
+static float dither = 0.003;
+
 static double lastKey = 0;
 
 const double KEY_REPEAT_INTERVAL = 0.25;
@@ -64,11 +66,13 @@ GLFWwindow* initAndCreateWindow() {
 
 void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     // ESCAPE TO CLOSE WINDOW
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
     // I/O TO ZOOM IN/OUT
+
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
         camDist -= 0.5;
         if (camDist < CAM_MIN_DIST) {
@@ -86,6 +90,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     double time = glfwGetTime();
 
     // PLUS/MINUS TO CHANGE PIXELATION SCALE
+
     if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_RELEASE
         || time - lastKey > KEY_REPEAT_INTERVAL) {
         plusKeyDebounce = true;
@@ -117,6 +122,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     }
 
     // T TO TOGGLE PALETTE MATCHING
+
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         if (tKeyDebounce) {
             togglePalette = !togglePalette;
@@ -130,6 +136,26 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
 
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
         tKeyDebounce = true;
+    }
+
+    // COMMA/PERIOD TO INCREASE/DECREASE DITHER AMOUNT
+
+    if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) {
+        dither -= 0.000025;
+        if (dither < 0.0) {
+            dither = 0.0;
+        }
+        pixel_art_effect.outline_program.SetUniform("Dither", dither);
+        std::cout << "Dithering Factor: " << dither << std::endl;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) {
+        dither += 0.000025;
+        if (dither > 0.025) {
+            dither = 0.025;
+        }
+        pixel_art_effect.outline_program.SetUniform("Dither", dither);
+        std::cout << "Dithering Factor: " << dither << std::endl;
     }
 }
 

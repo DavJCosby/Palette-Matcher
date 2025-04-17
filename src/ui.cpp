@@ -6,9 +6,9 @@
 static double lastMouseX;
 static double lastMouseY;
 
-static float camRotX = 3.14;
-static float camRotY = 1.57;
-static float camDist = 150;
+static float camRotX = 1.57;
+static float camRotY = 1.97;
+static float camDist = 400;
 
 static bool plusKeyDebounce = true;
 static bool minusKeyDebounce = true;
@@ -21,8 +21,8 @@ static double lastKey = 0;
 
 const double KEY_REPEAT_INTERVAL = 0.25;
 
-const float CAM_MIN_DIST = 50;
-const float CAM_MAX_DIST = 500;
+const float CAM_MIN_DIST = 200;
+const float CAM_MAX_DIST = 1200;
 
 float deg2rad(float deg) {
     return deg * 3.145 / 180.0;
@@ -141,7 +141,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     // COMMA/PERIOD TO INCREASE/DECREASE DITHER AMOUNT
 
     if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) {
-        dither -= 0.000025;
+        dither -= 0.00005;
         if (dither < 0.0) {
             dither = 0.0;
         }
@@ -150,7 +150,7 @@ void process_input(GLFWwindow* window, PixelArtEffect& pixel_art_effect) {
     }
 
     if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) {
-        dither += 0.000025;
+        dither += 0.00005;
         if (dither > 0.025) {
             dither = 0.025;
         }
@@ -189,7 +189,7 @@ void update_camera(GLFWwindow* window, ShaderPrograms& programs) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     cyMatrix4f projection = cy::Matrix4f::Perspective(
-        deg2rad(10.0),
+        deg2rad(5.0),
         (float)width / (float)height,
         1.0f,
         5000.0f

@@ -136,7 +136,7 @@ void apply_edges() {
 
 float linearize_depth(float depth) {
     float near = 1.0;
-    float far = 500.0;
+    float far = 5000.0;
     float linear_depth = (2.0 * near) / (far + near - depth * (far - near));
     return linear_depth;
 }

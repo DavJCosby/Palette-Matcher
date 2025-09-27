@@ -1,3 +1,5 @@
+Made as a final project for [Cem Yuksel's Interactive Computer Graphics](https://www.youtube.com/playlist?list=PLplnkTzzqsZS3R5DjmCQsqupu43oS9CFN) course.
+
 ![standard_settings](screenshots/demo.gif)
 
 # How to Use

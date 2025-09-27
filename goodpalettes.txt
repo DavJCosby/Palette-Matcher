@@ -1,6 +1,12 @@
 A few color palettes that work well in the demo scene, considering the model and lighting colors:
 https://lospec.com/palette-list/fading-16
 https://lospec.com/palette-list/arch
+https://lospec.com/palette-list/slso8
 https://lospec.com/palette-list/leopolds-dreams
 https://lospec.com/palette-list/purplemorning8
 https://lospec.com/palette-list/pastel-qt
+https://lospec.com/palette-list/sunraze
+https://lospec.com/palette-list/ladyday14
+https://lospec.com/palette-list/calm-sunset
+https://lospec.com/palette-list/galaxy-flame
+https://lospec.com/palette-list/rebirth

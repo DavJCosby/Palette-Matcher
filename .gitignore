@@ -33,3 +33,4 @@
 
 # Misc
 App.exe.dSYM/*
+.DS_Store

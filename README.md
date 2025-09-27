@@ -3,7 +3,7 @@
 Made as a final project for [Cem Yuksel's Interactive Computer Graphics](https://www.youtube.com/playlist?list=PLplnkTzzqsZS3R5DjmCQsqupu43oS9CFN) course.
 # How to Use
 
-_Tested on a MacBook Pro 2023 (Apple M2 Pro)_. You may need to update include paths in the Makefile to make the project work for your system.
+_Tested on a MacBook Pro 2023 (Apple M2 Pro). You may need to update include paths in the Makefile to make the project work for your system._
 
 Ensure you have [GLFW](https://www.glfw.org/) installed.
 
